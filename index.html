@@ -356,6 +356,31 @@
       box-shadow: 0 2px 8px rgba(149, 165, 166, 0.3);
     }
 
+    .student-name.absent {
+      background: linear-gradient(135deg, #e74c3c, #c0392b);
+      color: #fff;
+      text-decoration: line-through;
+      opacity: 0.7;
+      box-shadow: 0 2px 8px rgba(231, 76, 60, 0.3);
+      position: relative;
+    }
+
+    .student-name.absent::after {
+      content: "👋 AUSENTE";
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 10px;
+      background: rgba(0,0,0,0.3);
+      padding: 2px 6px;
+      border-radius: 10px;
+    }
+
+    .student-name:not(.removed):not(.absent) {
+      cursor: pointer;
+    }
+
     @keyframes confettiFall {
       0% {
         transform: translateY(-10px) rotate(0deg);
@@ -425,6 +450,9 @@
 
   <div class="students-list">
     <h3>📋 Lista de Alunos (Ordem Alfabética)</h3>
+    <p style="font-size: 14px; color: #666; margin-bottom: 15px;">
+      💡 <strong>Clique em um nome</strong> para marcar como ausente/presente
+    </p>
     <div class="students-grid" id="studentsGrid">
       <!-- Lista será preenchida pelo JavaScript -->
     </div>
@@ -465,6 +493,12 @@
     // Carrega a lista salva no localStorage (se houver); caso contrário, usa a lista original
     let alunos = JSON.parse(localStorage.getItem('alunosRestantes')) || [...originalAlunos];
 
+    // Remove alunos ausentes da lista de sorteio ao carregar
+    const alunosAusentes = JSON.parse(localStorage.getItem('alunosAusentes')) || [];
+    if (alunosAusentes.length > 0) {
+      alunos = alunos.filter(aluno => !alunosAusentes.includes(aluno.nome));
+    }
+
     const canvas = document.getElementById('wheel');
     const ctx = canvas.getContext('2d');
     const spinBtn = document.getElementById('spin');
@@ -491,6 +525,7 @@
     function updateStudentsList() {
       studentsGrid.innerHTML = '';
       const alunosJaSorteados = JSON.parse(localStorage.getItem('alunosSorteados')) || [];
+      const alunosAusentes = JSON.parse(localStorage.getItem('alunosAusentes')) || [];
       
       originalAlunos.forEach(aluno => {
         const div = document.createElement('div');
@@ -499,6 +534,13 @@
         
         if (alunosJaSorteados.includes(aluno.nome)) {
           div.classList.add('removed');
+        } else if (alunosAusentes.includes(aluno.nome)) {
+          div.classList.add('absent');
+        } else {
+          // Adiciona evento de clique apenas para alunos presentes
+          div.addEventListener('click', () => toggleAbsent(aluno.nome));
+          div.style.cursor = 'pointer';
+          div.title = 'Clique para marcar como ausente';
         }
         
         if (lastWinner === aluno.nome) {
@@ -511,6 +553,43 @@
         
         studentsGrid.appendChild(div);
       });
+    }
+
+    function toggleAbsent(nomeAluno) {
+      const alunosAusentes = JSON.parse(localStorage.getItem('alunosAusentes')) || [];
+      
+      if (alunosAusentes.includes(nomeAluno)) {
+        // Remove da lista de ausentes
+        const index = alunosAusentes.indexOf(nomeAluno);
+        alunosAusentes.splice(index, 1);
+        
+        // Adiciona de volta na lista de sorteio se não foi sorteado ainda
+        const alunosJaSorteados = JSON.parse(localStorage.getItem('alunosSorteados')) || [];
+        if (!alunosJaSorteados.includes(nomeAluno)) {
+          const alunoOriginal = originalAlunos.find(a => a.nome === nomeAluno);
+          if (alunoOriginal && !alunos.some(a => a.nome === nomeAluno)) {
+            alunos.push(alunoOriginal);
+            localStorage.setItem('alunosRestantes', JSON.stringify(alunos));
+          }
+        }
+      } else {
+        // Confirma antes de marcar como ausente
+        if (confirm(`Marcar ${nomeAluno} como ausente? Ele será removido do sorteio.`)) {
+          alunosAusentes.push(nomeAluno);
+          
+          // Remove da lista de sorteio
+          const index = alunos.findIndex(a => a.nome === nomeAluno);
+          if (index !== -1) {
+            alunos.splice(index, 1);
+            localStorage.setItem('alunosRestantes', JSON.stringify(alunos));
+          }
+        }
+      }
+      
+      localStorage.setItem('alunosAusentes', JSON.stringify(alunosAusentes));
+      updateStudentsList();
+      updateStudentsCount();
+      drawRotation();
     }
 
     function drawWheel() {
@@ -713,6 +792,7 @@
       // Limpa a persistência para começar do zero
       localStorage.removeItem('alunosRestantes');
       localStorage.removeItem('alunosSorteados');
+      localStorage.removeItem('alunosAusentes');
       angle = 0;
       winnerName.textContent = "Clique em 'Girar' para sortear!";
       winnerPhoto.innerHTML = "🎯";
