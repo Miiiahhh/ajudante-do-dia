@@ -2,565 +2,78 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AJUDANTE DO DIA</title>
-  <style>
-    body {
-      font-family: 'Comic Sans MS', cursive, sans-serif;
-      text-align: center;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      margin: 0;
-      padding: 20px;
-      min-height: 100vh;
-    }
-    
-    h1 {
-      color: white;
-      font-size: 3em;
-      margin-bottom: 30px;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-      animation: glow 2s ease-in-out infinite alternate;
-    }
-    
-    @keyframes glow {
-      from { text-shadow: 2px 2px 4px rgba(0,0,0,0.5), 0 0 10px #ffcc00; }
-      to { text-shadow: 2px 2px 4px rgba(0,0,0,0.5), 0 0 20px #ffcc00, 0 0 30px #ffcc00; }
-    }
-    
-    .container {
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      gap: 60px;
-      flex-wrap: wrap;
-      margin-bottom: 40px;
-      max-width: 1200px;
-      margin: 0 auto 40px;
-    }
-    
-    .wheel-section {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    
-    canvas {
-      border: 5px solid #ffcc00;
-      border-radius: 50%;
-      box-shadow: 0 0 30px rgba(255, 204, 0, 0.6), 0 10px 30px rgba(0,0,0,0.3);
-      background: white;
-      transition: transform 0.3s ease;
-    }
-    
-    canvas:hover {
-      transform: scale(1.02);
-    }
-    
-    .winner-section {
-      background: rgba(255, 255, 255, 0.95);
-      padding: 30px;
-      border-radius: 20px;
-      box-shadow: 0 15px 35px rgba(0,0,0,0.2);
-      min-width: 300px;
-      max-width: 350px;
-      backdrop-filter: blur(10px);
-      border: 2px solid rgba(255, 204, 0, 0.3);
-    }
-    
-    .winner-section h2 {
-      color: #ff6600;
-      margin-bottom: 25px;
-      font-size: 1.8em;
-      text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
-    }
-    
-    #winnerPhoto {
-      width: 200px;
-      height: 200px;
-      border-radius: 50%;
-      border: 8px solid #ffcc00;
-      background: linear-gradient(45deg, #ffcc00, #ff9999, #99ccff);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 20px;
-      font-size: 80px;
-      color: white;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-      box-shadow: 0 8px 25px rgba(0,0,0,0.3);
-      transition: all 0.3s ease;
-      overflow: hidden;
-      position: relative;
-    }
-    
-    #winnerPhoto::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.2) 50%, transparent 70%);
-      border-radius: 50%;
-    }
-    
-    #winnerPhoto img {
-      width: 100%;
-      height: 100%;
-      border-radius: 50%;
-      object-fit: cover;
-      position: relative;
-      z-index: 1;
-    }
-    
-    #winnerName {
-      font-size: 1.6em;
-      font-weight: bold;
-      color: #333;
-      margin: 15px 0;
-      text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
-      min-height: 50px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    
-    .buttons-container {
-      margin-top: 30px;
-      display: flex;
-      gap: 15px;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-    
-    button {
-      font-size: 1.3em;
-      padding: 15px 35px;
-      border: none;
-      border-radius: 50px;
-      cursor: pointer;
-      font-family: 'Comic Sans MS', cursive, sans-serif;
-      font-weight: bold;
-      transition: all 0.3s ease;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.2);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-    
-    #spin {
-      background: linear-gradient(45deg, #ffcc00, #ffd700);
-      color: #333;
-    }
-    
-    #spin:hover {
-      background: linear-gradient(45deg, #ffd700, #ffdf00);
-      transform: translateY(-3px);
-      box-shadow: 0 8px 25px rgba(255, 204, 0, 0.4);
-    }
-    
-    #spin:disabled {
-      background: #ccc;
-      cursor: not-allowed;
-      transform: none;
-      box-shadow: none;
-    }
-    
-    .reset-btn {
-      background: linear-gradient(45deg, #ff6666, #ff8888);
-      color: white;
-      font-size: 1.1em;
-      padding: 12px 25px;
-    }
-    
-    .reset-btn:hover {
-      background: linear-gradient(45deg, #ff8888, #ffaaaa);
-      transform: translateY(-3px);
-      box-shadow: 0 8px 25px rgba(255, 102, 102, 0.4);
-    }
-    
-    .students-left {
-      margin-top: 30px;
-      color: white;
-      font-size: 1.2em;
-      font-weight: bold;
-      text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-      background: rgba(255, 255, 255, 0.1);
-      padding: 15px 30px;
-      border-radius: 25px;
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      display: inline-block;
-    }
-    
-    .celebration {
-      animation: celebrate 0.8s ease-in-out;
-    }
-    
-    @keyframes celebrate {
-      0%, 100% { transform: scale(1) rotate(0deg); }
-      25% { transform: scale(1.1) rotate(-5deg); }
-      50% { transform: scale(1.2) rotate(5deg); }
-      75% { transform: scale(1.1) rotate(-3deg); }
-    }
-    
-    /* Efeito de partículas */
-    .particles {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: -1;
-    }
-    
-    .particle {
-      position: absolute;
-      background: rgba(255, 204, 0, 0.8);
-      border-radius: 50%;
-      animation: float 6s infinite ease-in-out;
-    }
-    
-    @keyframes float {
-      0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0; }
-      10% { opacity: 1; }
-      90% { opacity: 1; }
-      100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
-    }
-    
-    /* Responsividade */
-    @media (max-width: 768px) {
-      .container {
-        flex-direction: column;
-        gap: 30px;
-      }
-      
-      canvas {
-        width: 350px;
-        height: 350px;
-      }
-      
-      h1 {
-        font-size: 2.2em;
-      }
-      
-      #winnerPhoto {
-        width: 150px;
-        height: 150px;
-        font-size: 60px;
-      }
-      
-      .winner-section {
-        min-width: 280px;
-        padding: 20px;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="particles" id="particles"></div>
-  
+  <div class="floating-elements">
+    <div class="floating-star" style="left: 10%; animation-delay: 0s;">⭐</div>
+    <div class="floating-star" style="left: 80%; animation-delay: 1s;">🌟</div>
+    <div class="floating-star" style="left: 60%; animation-delay: 2s;">✨</div>
+    <div class="floating-star" style="left: 30%; animation-delay: 3s;">🎈</div>
+    <div class="floating-star" style="left: 90%; animation-delay: 4s;">🎊</div>
+    <div class="floating-star" style="left: 20%; animation-delay: 5s;">🌈</div>
+  </div>
+
   <h1>AJUDANTE DO DIA 🎉</h1>
   
   <div class="container">
-    <div class="wheel-section">
-      <canvas id="wheel" width="500" height="500"></canvas>
-    </div>
-    
-    <div class="winner-section">
-      <h2>🌟 ALUNO SORTEADO 🌟</h2>
+    <canvas id="wheel" width="500" height="500"></canvas>
+    <div id="winner">
+      <h2>ALUNO SORTEADO:</h2>
       <div id="winnerPhoto">🎯</div>
       <div id="winnerName">Clique em "Girar" para sortear!</div>
     </div>
   </div>
-  
-  <div class="buttons-container">
-    <button id="spin">🎯 Girar</button>
-    <button id="reset" class="reset-btn">🔄 Resetar Lista</button>
+
+  <div class="controls">
+    <button id="spin">🎲 GIRAR 🎲</button>
+    <button id="reset" class="reset-btn">🔄 RESETAR LISTA</button>
   </div>
-  
+
   <div class="students-left">
     <span id="studentsCount">27 alunos restantes</span>
   </div>
 
+  <div class="students-list">
+    <h3>📋 Lista de Alunos (Ordem Alfabética)</h3>
+    <div class="students-grid" id="studentsGrid">
+      <!-- Lista será preenchida pelo JavaScript -->
+    </div>
+  </div>
+
   <script>
+    // Lista organizada em ordem alfabética
     const originalAlunos = [
-      {'nome': 'NOAH', 'arquivo': 'alunos/noah.jpg'}, 
-      {'nome': 'NATHAN', 'arquivo': 'alunos/nathan.jpg'}, 
-      {'nome': 'EMILLY', 'arquivo': 'alunos/emilly.jpg'}, 
-      {'nome': 'LAURA', 'arquivo': 'alunos/laura.jpg'}, 
       {'nome': 'ANALU', 'arquivo': 'alunos/analu.jpg'}, 
-      {'nome': 'BENJAMIN', 'arquivo': 'alunos/benjamim.jpg'}, 
-      {'nome': 'BERNARDO', 'arquivo': 'alunos/bernardo.jpg'}, 
-      {'nome': 'MARIA ANTÔNIA', 'arquivo': 'alunos/maria_antonia.jpg'}, 
       {'nome': 'ARTHUR CALAZANS', 'arquivo': 'alunos/arthur_calazans.jpg'}, 
       {'nome': 'ARTHUR CHERICE', 'arquivo': 'alunos/arthur_cherice.jpg'}, 
-      {'nome': 'LUCAS H. PALHARES', 'arquivo': 'alunos/lucas_h._palhares.jpg'}, 
-      {'nome': 'GUSTAVO', 'arquivo': 'alunos/gustavo.jpg'}, 
-      {'nome': 'VALENTINA MARTINENGHI', 'arquivo': 'alunos/valentina_martinenghi.jpg'}, 
-      {'nome': 'MARTINA', 'arquivo': 'alunos/martina.jpg'}, 
       {'nome': 'BENÍCIO', 'arquivo': 'alunos/benicio.jpg'}, 
-      {'nome': 'THOMAS', 'arquivo': 'alunos/thomas.jpg'}, 
-      {'nome': 'MIGUEL', 'arquivo': 'alunos/miguel.jpg'}, 
-      {'nome': 'VALENTINA F. FIAMETTI', 'arquivo': 'alunos/valentina_fontana_fiametti.jpg'}, 
-      {'nome': 'MATEUS', 'arquivo': 'alunos/mateus.jpg'}, 
-      {'nome': 'MAITÊ', 'arquivo': 'alunos/maite.jpg'}, 
-      {'nome': 'JOÃO R. GROH', 'arquivo': 'alunos/joao_r._groh.jpg'}, 
+      {'nome': 'BENJAMIN', 'arquivo': 'alunos/benjamim.jpg'}, 
+      {'nome': 'BERNARDO', 'arquivo': 'alunos/bernardo.jpg'}, 
       {'nome': 'CLARA', 'arquivo': 'alunos/clara.jpg'}, 
+      {'nome': 'EMILLY', 'arquivo': 'alunos/emilly.jpg'}, 
+      {'nome': 'GUSTAVO', 'arquivo': 'alunos/gustavo.jpg'}, 
       {'nome': 'HEITOR', 'arquivo': 'alunos/heitor.jpg'}, 
-      {'nome': 'JOÃO LUIZ', 'arquivo': 'alunos/joao_luiz.jpg'}, 
-      {'nome': 'SOFIA', 'arquivo': 'alunos/sofia.jpg'}, 
       {'nome': 'HELENA', 'arquivo': 'alunos/helena.jpg'}, 
-      {'nome': 'LUCAS SANTIAGO', 'arquivo': 'alunos/lucas_santiago.jpg'}
+      {'nome': 'JOÃO LUIZ', 'arquivo': 'alunos/joao_luiz.jpg'}, 
+      {'nome': 'JOÃO R. GROH', 'arquivo': 'alunos/joao_r._groh.jpg'}, 
+      {'nome': 'LAURA', 'arquivo': 'alunos/laura.jpg'}, 
+      {'nome': 'LUCAS H. PALHARES', 'arquivo': 'alunos/lucas_h._palhares.jpg'}, 
+      {'nome': 'LUCAS SANTIAGO', 'arquivo': 'alunos/lucas_santiago.jpg'}, 
+      {'nome': 'MAITÊ', 'arquivo': 'alunos/maite.jpg'}, 
+      {'nome': 'MARIA ANTÔNIA', 'arquivo': 'alunos/maria_antonia.jpg'}, 
+      {'nome': 'MARTINA', 'arquivo': 'alunos/martina.jpg'}, 
+      {'nome': 'MATEUS', 'arquivo': 'alunos/mateus.jpg'}, 
+      {'nome': 'MIGUEL', 'arquivo': 'alunos/miguel.jpg'}, 
+      {'nome': 'NATHAN', 'arquivo': 'alunos/nathan.jpg'}, 
+      {'nome': 'NOAH', 'arquivo': 'alunos/noah.jpg'}, 
+      {'nome': 'SOFIA', 'arquivo': 'alunos/sofia.jpg'}, 
+      {'nome': 'THOMAS', 'arquivo': 'alunos/thomas.jpg'}, 
+      {'nome': 'VALENTINA F. FIAMETTI', 'arquivo': 'alunos/valentina_fontana_fiametti.jpg'}, 
+      {'nome': 'VALENTINA MARTINENGHI', 'arquivo': 'alunos/valentina_martinenghi.jpg'}
     ];
-
-    let alunos = [...originalAlunos];
-    const canvas = document.getElementById('wheel');
-    const ctx = canvas.getContext('2d');
-    const spinBtn = document.getElementById('spin');
-    const resetBtn = document.getElementById('reset');
-    const winnerName = document.getElementById('winnerName');
-    const winnerPhoto = document.getElementById('winnerPhoto');
-    const studentsCount = document.getElementById('studentsCount');
-
-    let angle = 0;
-    let spinning = false;
-
-    // Criar efeito de partículas
-    function createParticles() {
-      const particlesContainer = document.getElementById('particles');
-      
-      for (let i = 0; i < 15; i++) {
-        const particle = document.createElement('div');
-        particle.className = 'particle';
-        particle.style.left = Math.random() * 100 + '%';
-        particle.style.width = particle.style.height = Math.random() * 8 + 4 + 'px';
-        particle.style.animationDelay = Math.random() * 6 + 's';
-        particle.style.animationDuration = (Math.random() * 4 + 4) + 's';
-        particlesContainer.appendChild(particle);
-        
-        // Remove particle after animation
-        setTimeout(() => {
-          if (particle.parentNode) {
-            particle.parentNode.removeChild(particle);
-          }
-        }, 8000);
-      }
-    }
-
-    function updateStudentsCount() {
-      studentsCount.textContent = `${alunos.length} alunos restantes`;
-      if (alunos.length === 0) {
-        spinBtn.disabled = true;
-        winnerName.textContent = "🎉 Todos os alunos já foram sorteados! 🎉";
-      } else {
-        spinBtn.disabled = false;
-      }
-    }
-
-    function drawWheel() {
-      if (alunos.length === 0) {
-        ctx.clearRect(0, 0, 500, 500);
-        
-        // Gradient background
-        const gradient = ctx.createRadialGradient(250, 250, 0, 250, 250, 250);
-        gradient.addColorStop(0, '#ffcc00');
-        gradient.addColorStop(1, '#ff9999');
-        ctx.fillStyle = gradient;
-        ctx.fillRect(0, 0, 500, 500);
-        
-        ctx.fillStyle = "#333";
-        ctx.font = "bold 28px Comic Sans MS";
-        ctx.textAlign = "center";
-        ctx.fillText("🎉 PARABÉNS! 🎉", 250, 230);
-        ctx.font = "18px Comic Sans MS";
-        ctx.fillText("Todos foram sorteados!", 250, 270);
-        return;
-      }
-
-      ctx.clearRect(0, 0, 500, 500);
-      
-      const anglePerSector = 2 * Math.PI / alunos.length;
-      const colors = [
-        "#ff9999", "#99ccff", "#99ff99", "#ffcc99", 
-        "#ff99cc", "#ccff99", "#99ffcc", "#ffcccc",
-        "#ccccff", "#ffffcc", "#ffcc99", "#cc99ff"
-      ];
-      
-      for (let i = 0; i < alunos.length; i++) {
-        const angleStart = i * anglePerSector;
-        
-        // Draw sector
-        ctx.beginPath();
-        ctx.moveTo(250, 250);
-        ctx.arc(250, 250, 240, angleStart, angleStart + anglePerSector);
-        ctx.fillStyle = colors[i % colors.length];
-        ctx.fill();
-        
-        // Add subtle gradient
-        const gradient = ctx.createRadialGradient(250, 250, 180, 250, 250, 240);
-        gradient.addColorStop(0, 'rgba(255,255,255,0.3)');
-        gradient.addColorStop(1, 'rgba(0,0,0,0.1)');
-        ctx.fillStyle = gradient;
-        ctx.fill();
-        
-        // Border
-        ctx.strokeStyle = "#fff";
-        ctx.lineWidth = 3;
-        ctx.stroke();
-        
-        // Text
-        ctx.save();
-        ctx.translate(250, 250);
-        ctx.rotate(angleStart + anglePerSector / 2);
-        ctx.textAlign = "center";
-        ctx.fillStyle = "#333";
-        ctx.font = "bold 14px Comic Sans MS";
-        ctx.shadowColor = 'rgba(255,255,255,0.8)';
-        ctx.shadowBlur = 2;
-        
-        const nome = alunos[i].nome;
-        if (nome.length > 15) {
-          const palavras = nome.split(' ');
-          if (palavras.length > 1) {
-            ctx.fillText(palavras[0], 0, -180);
-            ctx.fillText(palavras.slice(1).join(' '), 0, -165);
-          } else {
-            ctx.fillText(nome.substring(0, 12) + '...', 0, -172);
-          }
-        } else {
-          ctx.fillText(nome, 0, -172);
-        }
-        
-        ctx.restore();
-      }
-
-      // Center circle with gradient
-      const centerGradient = ctx.createRadialGradient(250, 250, 0, 250, 250, 35);
-      centerGradient.addColorStop(0, '#ffdd00');
-      centerGradient.addColorStop(1, '#ffcc00');
-      
-      ctx.beginPath();
-      ctx.arc(250, 250, 35, 0, 2 * Math.PI);
-      ctx.fillStyle = centerGradient;
-      ctx.fill();
-      ctx.strokeStyle = "#333";
-      ctx.lineWidth = 4;
-      ctx.stroke();
-
-      // Arrow pointer with shadow
-      ctx.save();
-      ctx.shadowColor = 'rgba(0,0,0,0.5)';
-      ctx.shadowBlur = 8;
-      ctx.shadowOffsetY = 4;
-      
-      ctx.beginPath();
-      ctx.moveTo(250, 15);
-      ctx.lineTo(275, 50);
-      ctx.lineTo(225, 50);
-      ctx.closePath();
-      
-      const arrowGradient = ctx.createLinearGradient(225, 15, 275, 50);
-      arrowGradient.addColorStop(0, '#ff6600');
-      arrowGradient.addColorStop(1, '#ff8833');
-      ctx.fillStyle = arrowGradient;
-      ctx.fill();
-      
-      ctx.strokeStyle = "#333";
-      ctx.lineWidth = 3;
-      ctx.stroke();
-      ctx.restore();
-    }
-
-    function spinWheel() {
-      if (spinning || alunos.length === 0) return;
-      spinning = true;
-      
-      // Create particles effect
-      createParticles();
-
-      const rotation = 360 * 8 + Math.floor(Math.random() * 360);
-      const duration = 4000;
-      const start = performance.now();
-
-      function animate(now) {
-        const progress = Math.min((now - start) / duration, 1);
-        const eased = 1 - Math.pow(1 - progress, 3);
-        angle = eased * rotation;
-        drawRotation();
-        if (progress < 1) {
-          requestAnimationFrame(animate);
-        } else {
-          setTimeout(() => {
-            showWinner();
-            spinning = false;
-          }, 300);
-        }
-      }
-      requestAnimationFrame(animate);
-    }
-
-    function drawRotation() {
-      ctx.save();
-      ctx.translate(250, 250);
-      ctx.rotate((angle * Math.PI) / 180);
-      ctx.translate(-250, -250);
-      drawWheel();
-      ctx.restore();
-    }
-
-    function showWinner() {
-      const normalizedAngle = (360 - (angle % 360)) % 360;
-      const sectorAngle = 360 / alunos.length;
-      const index = Math.floor(normalizedAngle / sectorAngle) % alunos.length;
-      const sorteado = alunos.splice(index, 1)[0];
-      
-      winnerName.textContent = sorteado.nome;
-      
-      // Try to load student photo
-      const img = new Image();
-      img.onload = function() {
-        winnerPhoto.innerHTML = `<img src="${sorteado.arquivo}" alt="${sorteado.nome}">`;
-        triggerCelebration();
-      };
-      img.onerror = function() {
-        winnerPhoto.innerHTML = "🌟";
-        triggerCelebration();
-      };
-      img.src = sorteado.arquivo;
-      
-      updateStudentsCount();
-      drawRotation();
-    }
-
-    function triggerCelebration() {
-      winnerPhoto.classList.add('celebration');
-      createParticles();
-      
-      setTimeout(() => {
-        winnerPhoto.classList.remove('celebration');
-      }, 800);
-    }
-
-    function resetList() {
-      alunos = [...originalAlunos];
-      angle = 0;
-      winnerName.textContent = "Clique em 'Girar' para sortear!";
-      winnerPhoto.innerHTML = "🎯";
-      updateStudentsCount();
-      drawRotation();
-    }
-
-    // Event listeners
-    spinBtn.addEventListener("click", spinWheel);
-    resetBtn.addEventListener("click", resetList);
-
-    // Initialize
-    updateStudentsCount();
-    drawRotation();
-    
-    // Create initial particles
-    setInterval(createParticles, 8000);
   </script>
+  <script src="script.js"></script>
 </body>
 </html>
